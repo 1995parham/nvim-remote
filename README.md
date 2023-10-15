@@ -1,8 +1,6 @@
-[![Build status](https://travis-ci.org/mhinz/neovim-remote.svg?branch=master)](https://travis-ci.org/mhinz/neovim-remote)
-[![Supported Python versions](https://img.shields.io/pypi/pyversions/neovim-remote.svg)](https://pypi.python.org/pypi/neovim-remote)
-
 <div align='center'>
-  <h1>neovim-remote</h1><br>
+  <h1>nvim-remote</h1><br>
+  <h6>forked from https://github.com/mhinz/neovim-remote</h6>
 </div>
 
 This package provides an executable called **nvr** which solves these cases:
@@ -26,7 +24,7 @@ This package provides an executable called **nvr** which solves these cases:
 
     pip3 install neovim-remote
 
-If you encounter any issues, e.g. permission denied errors or you can't find the
+If you encounter any issues, e.g. permission denied errors, or you can't find the
 `nvr` executable, read [INSTALLATION.md](INSTALLATION.md).
 
 ## Theory
@@ -147,98 +145,99 @@ Development: https://github.com/mhinz/neovim-remote
 
 Happy hacking!
 ```
+
 </details>
 
 ## Typical use cases
 
 - **Open files from within `:terminal` without starting a nested nvim process.**
 
-    Easy-peasy! Just `nvr file`.
+  Easy-peasy! Just `nvr file`.
 
-    This works without any prior setup, because `$NVIM` is always set for all
-    children of the nvim process, including `:terminal`, and `nvr` will default
-    to that address.
+  This works without any prior setup, because `$NVIM` is always set for all
+  children of the nvim process, including `:terminal`, and `nvr` will default
+  to that address.
 
-    I often work with two windows next to each other. If one contains the
-    terminal, I can use `nvr -l foo` to open the file in the other window.
+  I often work with two windows next to each other. If one contains the
+  terminal, I can use `nvr -l foo` to open the file in the other window.
 
 - **Open files always in the same nvim process no matter which terminal you're in.**
 
-    Just `nvr -s` starts a new nvim process with the server address set to
-    `/tmp/nvimsocket`.
+  Just `nvr -s` starts a new nvim process with the server address set to
+  `/tmp/nvimsocket`.
 
-    Now, no matter which terminal you are in, `nvr file` will always work on
-    that nvim process. That is akin to `emacsclient` from Emacs.
+  Now, no matter which terminal you are in, `nvr file` will always work on
+  that nvim process. That is akin to `emacsclient` from Emacs.
 
 - **Use nvr in plugins.**
 
-    Some plugins rely on the `--remote` family of options from Vim. Nvim had to
-    remove those when they switched to outsource a lot of manual code to libuv.
-    These options are [planned to be added back](https://github.com/neovim/neovim/issues/1750), though.
+  Some plugins rely on the `--remote` family of options from Vim. Nvim had to
+  remove those when they switched to outsource a lot of manual code to libuv.
+  These options are [planned to be added back](https://github.com/neovim/neovim/issues/1750), though.
 
-    In these cases nvr can be used as a drop-in replacement. E.g.
-    [vimtex](https://github.com/lervag/vimtex) can be configured to use nvr to
-    jump to a certain file and line: [read](https://github.com/lervag/vimtex/blob/80b96c13fe9edc5261e9be104fe15cf3bdc3173d/doc/vimtex.txt#L1702-L1708).
+  In these cases nvr can be used as a drop-in replacement. E.g.
+  [vimtex](https://github.com/lervag/vimtex) can be configured to use nvr to
+  jump to a certain file and line: [read](https://github.com/lervag/vimtex/blob/80b96c13fe9edc5261e9be104fe15cf3bdc3173d/doc/vimtex.txt#L1702-L1708).
 
 - **Use nvr as git editor.**
 
-    Imagine Neovim is set as your default editor via `$VISUAL` or `$EDITOR`.
+  Imagine Neovim is set as your default editor via `$VISUAL` or `$EDITOR`.
 
-    Running `git commit` in a regular shell starts a nvim process. But in a
-    terminal buffer (`:terminal`), a new nvim process starts as well. Now you
-    have one nvim nested within another.
-    
-    If you do not want this, put this in your vimrc:
+  Running `git commit` in a regular shell starts a nvim process. But in a
+  terminal buffer (`:terminal`), a new nvim process starts as well. Now you
+  have one nvim nested within another.
 
-    ```vim
-    if has('nvim')
-      let $GIT_EDITOR = 'nvr -cc split --remote-wait'
-    endif
-    ```
+  If you do not want this, put this in your vimrc:
 
-    That way, you get a new window for inserting the commit message instead of a
-    nested nvim process. But git still waits for nvr to finish, so make sure to
-    delete the buffer after saving the commit message: `:w | bd`.
+  ```vim
+  if has('nvim')
+    let $GIT_EDITOR = 'nvr -cc split --remote-wait'
+  endif
+  ```
 
-    If you don't like using `:w | bd` and prefer the good old `:wq` (or `:x`),
-    put the following in your vimrc:
+  That way, you get a new window for inserting the commit message instead of a
+  nested nvim process. But git still waits for nvr to finish, so make sure to
+  delete the buffer after saving the commit message: `:w | bd`.
 
-    ```vim
-    autocmd FileType gitcommit,gitrebase,gitconfig set bufhidden=delete
-    ```
+  If you don't like using `:w | bd` and prefer the good old `:wq` (or `:x`),
+  put the following in your vimrc:
 
-    To use nvr from a regular shell as well:
+  ```vim
+  autocmd FileType gitcommit,gitrebase,gitconfig set bufhidden=delete
+  ```
 
-        $ git config --global core.editor 'nvr --remote-wait-silent'
+  To use nvr from a regular shell as well:
+
+        git config --global core.editor 'nvr --remote-wait-silent'
 
 - **Use nvr as git mergetool.**
 
-    If you want to use nvr for `git difftool` and `git mergetool`, put this in
-    your gitconfig:
+  If you want to use nvr for `git difftool` and `git mergetool`, put this in
+  your gitconfig:
 
-    ```
-    [diff]
-        tool = nvr
-    [difftool "nvr"]
-        cmd = nvr -s -d $LOCAL $REMOTE
-    [merge]
-        tool = nvr
-    [mergetool "nvr"]
-        cmd = nvr -s -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd J | wincmd ='
-    ```
+  ```
+  [diff]
+      tool = nvr
+  [difftool "nvr"]
+      cmd = nvr -s -d $LOCAL $REMOTE
+  [merge]
+      tool = nvr
+  [mergetool "nvr"]
+      cmd = nvr -s -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd J | wincmd ='
+  ```
 
-    `nvr -d` is a shortcut for `nvr -d -O` and acts like `vim -d`, thus it uses
-    `:vsplit` to open the buffers. If you want them to be opened via `:split`
-    instead, use `nvr -d -o`.
+  `nvr -d` is a shortcut for `nvr -d -O` and acts like `vim -d`, thus it uses
+  `:vsplit` to open the buffers. If you want them to be opened via `:split`
+  instead, use `nvr -d -o`.
 
-    When used as mergetool and all four buffers got opened, the cursor is in the
-    window containing the $MERGED buffer. We move it to the bottom via `:wincmd
-    J` and then equalize the size of all windows via `:wincmd =`.
+  When used as mergetool and all four buffers got opened, the cursor is in the
+  window containing the $MERGED buffer. We move it to the bottom via `:wincmd
+J` and then equalize the size of all windows via `:wincmd =`.
 
 - **Use nvr for scripting.**
 
-    You might draw some inspiration from [this Reddit
-    thread](https://www.reddit.com/r/neovim/comments/aex45u/integrating_nvr_and_tmux_to_use_a_single_tmux_per).
+  You might draw some inspiration from [this Reddit
+  thread](https://www.reddit.com/r/neovim/comments/aex45u/integrating_nvr_and_tmux_to_use_a_single_tmux_per).
 
 ## Demos
 
@@ -252,51 +251,51 @@ Using nvr from within `:terminal`: ![Demo 2](https://github.com/mhinz/neovim-rem
 
 - **How to open directories?**
 
-    `:e /tmp` opens a directory view via netrw. Netrw works by hooking into certain
-    events, `BufEnter` in this case (see `:au FileExplorer` for all of them).
+  `:e /tmp` opens a directory view via netrw. Netrw works by hooking into certain
+  events, `BufEnter` in this case (see `:au FileExplorer` for all of them).
 
-    Unfortunately Neovim's API doesn't trigger any autocmds on its own, so simply
-    `nvr /tmp` won't work. Meanwhile you can work around it like this:
+  Unfortunately Neovim's API doesn't trigger any autocmds on its own, so simply
+  `nvr /tmp` won't work. Meanwhile you can work around it like this:
 
-        $ nvr /tmp -c 'doautocmd BufEnter'
+        nvr /tmp -c 'doautocmd BufEnter'
 
 - **Reading from stdin?**
 
-    Yes! E.g. `echo "foo\nbar" | nvr -o -` and `cat file | nvr --remote -` work just
-    as you would expect them to work.
+  Yes! E.g. `echo "foo\nbar" | nvr -o -` and `cat file | nvr --remote -` work just
+  as you would expect them to work.
 
 - **Exit code?**
 
-    If you use a [recent enough
-    Neovim](https://github.com/neovim/neovim/commit/d2e8c76dc22460ddfde80477dd93aab3d5866506), nvr will use the same exit code as the linked nvim.
+  If you use a [recent enough
+  Neovim](https://github.com/neovim/neovim/commit/d2e8c76dc22460ddfde80477dd93aab3d5866506), nvr will use the same exit code as the linked nvim.
 
-    E.g. `nvr --remote-wait <file>` and then `:cquit` in the linked nvim will make
-    nvr return with 1.
+  E.g. `nvr --remote-wait <file>` and then `:cquit` in the linked nvim will make
+  nvr return with 1.
 
 - **How to send a message to all waiting clients?**
 
-    If you open a buffer with any of the _wait_ options, that buffer will get a
-    variable `b:nvr`. The variable contains a list of channels wheres each
-    channel is a waiting nvr client.
+  If you open a buffer with any of the _wait_ options, that buffer will get a
+  variable `b:nvr`. The variable contains a list of channels wheres each
+  channel is a waiting nvr client.
 
-    Currently nvr only understands the `Exit` message. You could use it to
-    disconnect all waiting nvr clients at once:
+  Currently nvr only understands the `Exit` message. You could use it to
+  disconnect all waiting nvr clients at once:
 
-    ```vim
-    command! DisconnectClients
-        \  if exists('b:nvr')
-        \|   for client in b:nvr
-        \|     silent! call rpcnotify(client, 'Exit', 1)
-        \|   endfor
-        \| endif
-    ```
+  ```vim
+  command! DisconnectClients
+      \  if exists('b:nvr')
+      \|   for client in b:nvr
+      \|     silent! call rpcnotify(client, 'Exit', 1)
+      \|   endfor
+      \| endif
+  ```
 
 - **Can I have auto-completion for bash/fish?**
 
-    If you want basic auto-completion for bash, you can source [this
-    script](contrib/completion.bash) in your .bashrc.
+  If you want basic auto-completion for bash, you can source [this
+  script](contrib/completion.bash) in your .bashrc.
 
-    This also completes server names with the `--servername` option.
+  This also completes server names with the `--servername` option.
 
-    If you want auto-completion for fish, you can add [this
-    file](contrib/completion.fish) to your fish completions dir.
+  If you want auto-completion for fish, you can add [this
+  file](contrib/completion.fish) to your fish completions dir.
