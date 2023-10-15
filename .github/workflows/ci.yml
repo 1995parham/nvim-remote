@@ -14,6 +14,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.version }}
+      - uses: MunifTanjim/setup-neovim-action@v1
+        with:
+          tag: nightly
+      - run: nvim --version
       - run: pip install poetry
       - run: poetry install
       - run: poetry run pytest
