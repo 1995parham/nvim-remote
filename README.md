@@ -1,10 +1,8 @@
+<h1 align="center">nvim remote</h1>
+<h6 align="center">forked from https://github.com/mhinz/neovim-remote</h6>
 <p align='center'>
-  <h1>nvim remote</h1><br>
-  
   <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/nvim-remote?style=for-the-badge&logo=pypi">
   <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/1995parham/nvim-remote?style=for-the-badge&logo=github">
-
-  <h6>forked from https://github.com/mhinz/neovim-remote</h6>
 </p>
 
 This package provides an executable called **nvr** which solves these cases:
