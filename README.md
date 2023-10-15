@@ -25,9 +25,9 @@ This package provides an executable called **nvr** which solves these cases:
 ## Installation
 
 ```bash
-    pip3 install nvim-remote
+pip3 install nvim-remote
 
-    pipx install nvim-remote
+pipx install nvim-remote
 ```
 
 ## Theory
@@ -48,7 +48,7 @@ forking, so it won't work on Windows.)_
 Start a nvim process (which acts as a server) in one shell:
 
 ```bash
-    nvim --listen /tmp/nvimsocket
+nvim --listen /tmp/nvimsocket
 ```
 
 And do this in another shell:
