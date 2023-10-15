@@ -24,21 +24,22 @@ This package provides an executable called **nvr** which solves these cases:
 
 ## Installation
 
-    pip3 install neovim-remote
+```bash
+    pip3 install nvim-remote
 
-If you encounter any issues, e.g. permission denied errors, or you can't find the
-`nvr` executable, read [INSTALLATION.md](INSTALLATION.md).
+    pipx install nvim-remote
+```
 
 ## Theory
 
-**Nvim** always starts a server. Get its address with `:echo v:servername`. Or
+`nvim` always starts a server. Get its address with `:echo v:servername`. Or
 specify an address at startup: `nvim --listen /tmp/nvimsocket`.
 
-**nvr** (the client) will use any address given to it via `--servername`,
-`$NVIM_LISTEN_ADDRESS` (obsolete in nvim but still supported in nvr), or
+`nvr` (the client) will use any address given to it via `--servername`,
+`$NVIM_LISTEN_ADDRESS` (obsolete in nvim but still supported in `nvr`), or
 defaults to `/tmp/nvimsocket`.
 
-If the targeted address does not exist, **nvr** starts a new process by running
+If the targeted address does not exist, `nvr` starts a new process by running
 "nvim". You can change the command by setting `$NVR_CMD`. _(This requires
 forking, so it won't work on Windows.)_
 
@@ -46,11 +47,13 @@ forking, so it won't work on Windows.)_
 
 Start a nvim process (which acts as a server) in one shell:
 
+```bash
     nvim --listen /tmp/nvimsocket
+```
 
 And do this in another shell:
 
-```sh
+```bash
 # nvr uses /tmp/nvimsocket by default, so we're good.
 
 # Open two files:
@@ -68,7 +71,7 @@ README.md
 <details>
 <summary>click here to see all nvr options</summary>
 
-```
+```bash
 $ nvr -h
 usage: nvr [arguments]
 
