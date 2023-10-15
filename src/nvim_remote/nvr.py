@@ -203,9 +203,7 @@ def is_netrw_protocol(path):
 def parse_args(argv):
     form_class = argparse.RawDescriptionHelpFormatter
     usage = argv[0] + " [arguments]"
-    epilog = (
-        "Development: https://github.com/mhinz/neovim-remote\n\nHappy hacking!"
-    )
+    epilog = "Development: https://github.com/1995parham/nvim-remote\n\nHappy hacking!"
     desc = textwrap.dedent(
         """
         Remote control Neovim processes.
