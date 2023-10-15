@@ -2,12 +2,16 @@
 name = "nvim-remote"
 version = "3.0.0"
 description = "Control nvim processes using \"nvr\" commandline tool"
-authors = ["Parham Alvani <parham.alvani@gmail.com>"]
+authors = [
+  "Parham Alvani <parham.alvani@gmail.com>",
+  "Marco Hinz <mh.codebro@gmail.com>",
+  "Roozbeh Sharifnasab <rsharifnasab@gmail.com>",
+]
 license = "'MIT'"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.9"
 pynvim = "^0.4.3"
 psutil = "^5.9.6"
 
