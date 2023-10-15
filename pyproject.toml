@@ -9,8 +9,9 @@ authors = [
 ]
 license = "MIT"
 readme = "README.md"
-url = "https://github.com/1995parham/nvim-remote"
+repository = "https://github.com/1995parham/nvim-remote"
 keywords = ["nvim-remote", "neovim-remote", "nvr"]
+packages = [{ include = 'nvr' }]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
