@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "nvim-remote"
+version = "3.0.0"
+description = "Control nvim processes using \"nvr\" commandline tool"
+authors = ["Parham Alvani <parham.alvani@gmail.com>"]
+license = "'MIT'"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pynvim = "^0.4.3"
+psutil = "^5.9.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
