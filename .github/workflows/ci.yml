@@ -15,5 +15,5 @@ jobs:
         with:
           python-version: ${{ matrix.version }}
       - run: pip install poetry
-      - run: poetry install --dev -v
+      - run: poetry install
       - run: poetry run pytest
