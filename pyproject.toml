@@ -7,8 +7,10 @@ authors = [
   "Marco Hinz <mh.codebro@gmail.com>",
   "Roozbeh Sharifnasab <rsharifnasab@gmail.com>",
 ]
-license = "'MIT'"
+license = "MIT"
 readme = "README.md"
+url = "https://github.com/1995parham/nvim-remote"
+keywords = ["nvim-remote", "neovim-remote", "nvr"]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
