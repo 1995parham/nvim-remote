@@ -3,6 +3,7 @@
 <p align='center'>
   <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/nvim-remote?style=for-the-badge&logo=pypi">
   <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/1995parham/nvim-remote?style=for-the-badge&logo=github">
+  <img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/1995parham/nvim-remote/ci.yml?style=for-the-badge&logo=github">
 </p>
 
 This package provides an executable called **nvr** which solves these cases:
