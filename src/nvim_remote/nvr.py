@@ -144,9 +144,14 @@ class Nvr:
 
         self.wait += 1
 
-    def execute(self, arguments, cmd="edit", silent=False, wait=False):
+    def execute(
+        self, arguments, cmd="edit", silent=False, wait=False, bufdelete=False
+    ):
         assert self.server is not None
         cmds, files = split_cmds_from_files(arguments)
+
+        if bufdelete:
+            self.server.command("set bufhidden=delete")
 
         for fname in files:
             if fname == "-":
@@ -335,6 +340,11 @@ def parse_args(argv):
         help='Change to previous window via ":wincmd p".',
     )
     parser.add_argument(
+        "--bufdelete",
+        action="store_true",
+        help="set bufhidden to delete",
+    )
+    parser.add_argument(
         "-o", nargs="+", metavar="<file>", help='Open files via ":split".'
     )
     parser.add_argument(
@@ -520,7 +530,9 @@ def main(argv=sys.argv, env=os.environ):
     proceed_after_attach(nvr, options, arguments)
 
 
-def proceed_after_attach(nvr, options, arguments):
+def proceed_after_attach(nvr: Nvr, options, arguments):
+    assert nvr.server is not None
+
     if options.d:
         nvr.diffmode = True
 
@@ -534,25 +546,50 @@ def proceed_after_attach(nvr, options, arguments):
         nvr.server.command("wincmd p")
 
     if options.remote is not None:
-        nvr.execute(options.remote + arguments, "edit")
+        nvr.execute(
+            options.remote + arguments, "edit", bufdelete=options.bufdelete
+        )
     elif options.remote_wait is not None:
-        nvr.execute(options.remote_wait + arguments, "edit", wait=True)
+        nvr.execute(
+            options.remote_wait + arguments,
+            "edit",
+            wait=True,
+            bufdelete=options.bufdelete,
+        )
     elif options.remote_silent is not None:
-        nvr.execute(options.remote_silent + arguments, "edit", silent=True)
+        nvr.execute(
+            options.remote_silent + arguments,
+            "edit",
+            silent=True,
+            bufdelete=options.bufdelete,
+        )
     elif options.remote_wait_silent is not None:
         nvr.execute(
             options.remote_wait_silent + arguments,
             "edit",
             silent=True,
             wait=True,
+            bufdelete=options.bufdelete,
         )
     elif options.remote_tab is not None:
-        nvr.execute(options.remote_tab + arguments, "tabedit")
+        nvr.execute(
+            options.remote_tab + arguments,
+            "tabedit",
+            bufdelete=options.bufdelete,
+        )
     elif options.remote_tab_wait is not None:
-        nvr.execute(options.remote_tab_wait + arguments, "tabedit", wait=True)
+        nvr.execute(
+            options.remote_tab_wait + arguments,
+            "tabedit",
+            wait=True,
+            bufdelete=options.bufdelete,
+        )
     elif options.remote_tab_silent is not None:
         nvr.execute(
-            options.remote_tab_silent + arguments, "tabedit", silent=True
+            options.remote_tab_silent + arguments,
+            "tabedit",
+            silent=True,
+            bufdelete=options.bufdelete,
         )
     elif options.remote_tab_wait_silent is not None:
         nvr.execute(
@@ -560,6 +597,7 @@ def proceed_after_attach(nvr, options, arguments):
             "tabedit",
             silent=True,
             wait=True,
+            bufdelete=options.bufdelete,
         )
     elif arguments and options.d:
         # Emulate `vim -d`.
@@ -628,7 +666,12 @@ def proceed_after_attach(nvr, options, arguments):
         nvr.execute(options.p + arguments, "tabedit", silent=True, wait=False)
     else:
         # Act like --remote-silent by default.
-        nvr.execute(arguments, "edit", silent=True)
+        nvr.execute(
+            arguments,
+            "edit",
+            silent=True,
+            bufdelete=options.bufdelete,
+        )
 
     if options.t:
         try:
