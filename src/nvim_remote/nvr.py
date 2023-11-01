@@ -167,7 +167,7 @@ class Nvr:
                     else:
                         self.fnameescaped_command(cmd, fname)
                 except pynvim.NvimError as e:
-                    if not re.search("E37", e.args[0].decode()):
+                    if not re.search("E37", e.args[0]):
                         traceback.print_exc()
                         sys.exit(1)
             self.diffthis()
