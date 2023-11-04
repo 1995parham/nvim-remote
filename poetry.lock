@@ -232,21 +232,26 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "pynvim"
-version = "0.4.3"
-description = "Python client to neovim"
+version = "0.5.0.dev0"
+description = "Python client for Neovim"
 optional = false
-python-versions = "*"
-files = [
-    {file = "pynvim-0.4.3.tar.gz", hash = "sha256:3a795378bde5e8092fbeb3a1a99be9c613d2685542f1db0e5c6fd467eed56dff"},
-]
+python-versions = ">=3.7"
+files = []
+develop = false
 
 [package.dependencies]
-greenlet = "*"
+greenlet = ">=3.0"
 msgpack = ">=0.5.0"
 
 [package.extras]
 pyuv = ["pyuv (>=1.0.0)"]
-test = ["pytest (>=3.4.0)"]
+test = ["pytest"]
+
+[package.source]
+type = "git"
+url = "https://github.com/neovim/pynvim"
+reference = "HEAD"
+resolved_reference = "71d2d65f21eb1b3faa91addaa3a18d985bd48b99"
 
 [[package]]
 name = "pytest"
@@ -284,4 +289,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "8ca38da44e8ea48730aa6378938911070a0afdd5c80aafeb93b2e5812d68449e"
+content-hash = "865c1de10fcbbbbab5e02e41a04202b602178d3ba3664e5796346bf6475e3a96"

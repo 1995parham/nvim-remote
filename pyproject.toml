@@ -17,7 +17,7 @@ nvr = 'nvim_remote:main'
 
 [tool.poetry.dependencies]
 python = ">=3.9"
-pynvim = "^0.4.3"
+pynvim = {git = "https://github.com/neovim/pynvim"}
 psutil = "^5.9.6"
 
 
