@@ -16,7 +16,7 @@ keywords = ["nvim-remote", "neovim-remote", "nvr"]
 nvr = 'nvim_remote:main'
 
 [tool.poetry.dependencies]
-python = ">=3.9"
+python = ">=3.10"
 pynvim = { git = "https://github.com/neovim/pynvim" }
 psutil = "^5.9.6"
 
