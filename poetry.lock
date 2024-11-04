@@ -229,13 +229,13 @@ test = ["pytest", "pytest-xdist", "setuptools"]
 
 [[package]]
 name = "pynvim"
-version = "0.5.0"
+version = "0.5.1"
 description = "Python client for Neovim"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pynvim-0.5.0-py2.py3-none-any.whl", hash = "sha256:2ac197ef0cdfff53719184a45c33cfb7cef88d1c9bf7f0525c21b3239cb5365f"},
-    {file = "pynvim-0.5.0.tar.gz", hash = "sha256:e80a11f6f5d194c6a47bea4135b90b55faca24da3544da7cf4a5f7ba8fb09215"},
+    {file = "pynvim-0.5.1-py2.py3-none-any.whl", hash = "sha256:cf8d9141109e5319388ff06df641c35d2c1bffc763a4da2345a63a71079ce353"},
+    {file = "pynvim-0.5.1.tar.gz", hash = "sha256:ed99cbaf286998aad48564ae13d26933b9106fc5a917a719798d2f2b2b8683ae"},
 ]
 
 [package.dependencies]
@@ -243,8 +243,8 @@ greenlet = ">=3.0"
 msgpack = ">=0.5.0"
 
 [package.extras]
-pyuv = ["pyuv (>=1.0.0)"]
-test = ["pytest"]
+docs = ["sphinx", "sphinx-rtd-theme"]
+test = ["pytest", "pytest-timeout"]
 
 [[package]]
 name = "pytest"
