@@ -17,7 +17,7 @@ nvr = 'nvim_remote:main'
 
 [tool.poetry.dependencies]
 python = ">=3.12"
-pynvim = "^0.5.0"
+pynvim = ">=0.5,<0.7"
 psutil = ">=5.9.6,<8.0.0"
 
 
