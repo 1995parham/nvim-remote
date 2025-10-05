@@ -30,35 +30,36 @@ import sys
 import textwrap
 import time
 import traceback
+from typing import Any, NoReturn
 
 import psutil
 import pynvim
 
 
 class Nvr:
-    def __init__(self, address: str, silent=False):
+    def __init__(self, address: str, silent: bool = False) -> None:
         self.address: str = address
         self.server: pynvim.Nvim | None = None
-        self.silent = silent
-        self.wait = 0
-        self.started_new_process = False
-        self.handled_first_buffer = False
-        self.diffmode = False
+        self.silent: bool = silent
+        self.wait: int = 0
+        self.started_new_process: bool = False
+        self.handled_first_buffer: bool = False
+        self.diffmode: bool = False
 
-    def attach(self):
+    def attach(self) -> None:
         try:
             socktype, address, port = parse_address(self.address)
             if socktype == "tcp" and port is not None:
-                self.server = pynvim.attach(
-                    "tcp", address=address, port=int(port)
-                )
+                self.server = pynvim.attach("tcp", address=address, port=int(port))
             else:
                 self.server = pynvim.attach("socket", path=address)
         except OSError:
             # Ignore invalid addresses.
             pass
 
-    def try_attach(self, args, nvr, options, arguments):
+    def try_attach(
+        self, args: str, nvr: "Nvr", options: argparse.Namespace, arguments: list[str]
+    ) -> None:
         for _ in range(10):
             self.attach()
             if self.server:
@@ -66,11 +67,18 @@ class Nvr:
                 return proceed_after_attach(nvr, options, arguments)
             time.sleep(0.2)
         print(
-            f'[!] Unable to attach to the new nvim process. Is `{" ".join(args)}` working?'
+            "[!] Unable to attach to the new nvim process. "
+            f"Is `{' '.join(args)}` working?"
         )
         sys.exit(1)
 
-    def execute_new_nvim_process(self, silent, nvr, options, arguments):
+    def execute_new_nvim_process(
+        self,
+        silent: bool,
+        nvr: "Nvr",
+        options: argparse.Namespace,
+        arguments: list[str],
+    ) -> NoReturn:
         if not silent:
             print(
                 textwrap.dedent(
@@ -82,8 +90,8 @@ class Nvr:
                 )
             )
 
-        args = os.environ.get("NVR_CMD")
-        args = args.split(" ") if args else ["nvim"]
+        nvr_cmd = os.environ.get("NVR_CMD")
+        args: list[str] = nvr_cmd.split(" ") if nvr_cmd else ["nvim"]
         args.extend(["--listen", self.address])
 
         multiprocessing.Process(
@@ -93,19 +101,17 @@ class Nvr:
         try:
             os.execvpe(args[0], args, os.environ)
         except FileNotFoundError:
-            print(
-                f"[!] Can't start new nvim process: `{args[0]}` is not in $PATH."
-            )
+            print(f"[!] Can't start new nvim process: `{args[0]}` is not in $PATH.")
             sys.exit(1)
 
-    def read_stdin_into_buffer(self, cmd):
+    def read_stdin_into_buffer(self, cmd: str) -> None:
         assert self.server is not None
         self.server.command(cmd)
         for line in sys.stdin:
             self.server.funcs.append("$", line[:-1])
         self.server.command("silent 1delete _ | set nomodified")
 
-    def fnameescaped_command(self, cmd, path):
+    def fnameescaped_command(self, cmd: str, path: str) -> None:
         assert self.server is not None
         if not is_netrw_protocol(path):
             path = os.path.abspath(path)
@@ -115,14 +121,14 @@ class Nvr:
         self.server.command(f"{cmd} {path}")
         self.server.options["shortmess"] = shortmess
 
-    def diffthis(self):
+    def diffthis(self) -> None:
         assert self.server is not None
         if self.diffmode:
             self.server.command("diffthis")
             if not self.started_new_process:
                 self.wait_for_current_buffer()
 
-    def wait_for_current_buffer(self):
+    def wait_for_current_buffer(self) -> None:
         assert self.server is not None
         bvars = self.server.current.buffer.vars
         chanid = self.server.channel_id
@@ -132,7 +138,8 @@ class Nvr:
             f'autocmd BufDelete <buffer> silent! call rpcnotify({chanid}, "BufDelete")'
         )
         self.server.command(
-            f'autocmd VimLeave * if exists("v:exiting") && v:exiting > 0 | silent! call rpcnotify({chanid}, "Exit", v:exiting) | endif'
+            f'autocmd VimLeave * if exists("v:exiting") && v:exiting > 0 | '
+            f'silent! call rpcnotify({chanid}, "Exit", v:exiting) | endif'
         )
         self.server.command("augroup END")
 
@@ -145,8 +152,13 @@ class Nvr:
         self.wait += 1
 
     def execute(
-        self, arguments, cmd="edit", silent=False, wait=False, bufdelete=False
-    ):
+        self,
+        arguments: list[str],
+        cmd: str = "edit",
+        silent: bool = False,
+        wait: bool = False,
+        bufdelete: bool = False,
+    ) -> int:
         assert self.server is not None
         cmds, files = split_cmds_from_files(arguments)
 
@@ -158,10 +170,7 @@ class Nvr:
                 self.read_stdin_into_buffer(stdin_cmd(cmd))
             else:
                 try:
-                    if (
-                        self.started_new_process
-                        and not self.handled_first_buffer
-                    ):
+                    if self.started_new_process and not self.handled_first_buffer:
                         self.fnameescaped_command("edit", fname)
                         self.handled_first_buffer = True
                     else:
@@ -181,7 +190,7 @@ class Nvr:
         return len(files)
 
 
-def stdin_cmd(cmd):
+def stdin_cmd(cmd: str) -> str:
     return {
         "edit": "enew",
         "split": "new",
@@ -190,7 +199,7 @@ def stdin_cmd(cmd):
     }[cmd]
 
 
-def is_netrw_protocol(path):
+def is_netrw_protocol(path: str) -> bool:
     protocols = [
         re.compile("^davs?://*"),
         re.compile("^file://*"),
@@ -202,10 +211,10 @@ def is_netrw_protocol(path):
         re.compile("^sftp://*"),
     ]
 
-    return True if any(prot.match(path) for prot in protocols) else False
+    return bool(any(prot.match(path) for prot in protocols))
 
 
-def parse_args(argv):
+def parse_args(argv: list[str]) -> tuple[argparse.Namespace, list[str]]:
     form_class = argparse.RawDescriptionHelpFormatter
     usage = argv[0] + " [arguments]"
     epilog = "Development: https://github.com/1995parham/nvim-remote\n\nHappy hacking!"
@@ -251,13 +260,19 @@ def parse_args(argv):
         "--remote",
         nargs="*",
         metavar="<file>",
-        help="Use :edit to open files. If no process is found, throw an error and start a new one.",
+        help=(
+            "Use :edit to open files. If no process is found, "
+            "throw an error and start a new one."
+        ),
     )
     parser.add_argument(
         "--remote-wait",
         nargs="*",
         metavar="<file>",
-        help="Like --remote, but block until all buffers opened by this option get deleted or the process exits.",
+        help=(
+            "Like --remote, but block until all buffers opened by this "
+            "option get deleted or the process exits."
+        ),
     )
     parser.add_argument(
         "--remote-silent",
@@ -297,9 +312,7 @@ def parse_args(argv):
         help="Like --remote-wait-silent, but use :tabedit.",
     )
 
-    parser.add_argument(
-        "--remote-send", metavar="<keys>", help="Send key presses."
-    )
+    parser.add_argument("--remote-send", metavar="<keys>", help="Send key presses.")
     parser.add_argument(
         "--remote-expr",
         metavar="<expr>",
@@ -309,7 +322,10 @@ def parse_args(argv):
     parser.add_argument(
         "--servername",
         metavar="<addr>",
-        help='Set the address to be used. This overrides the default "/tmp/nvimsocket" and $NVIM_LISTEN_ADDRESS.',
+        help=(
+            "Set the address to be used. This overrides the default "
+            '"/tmp/nvimsocket" and $NVIM_LISTEN_ADDRESS.'
+        ),
     )
     parser.add_argument(
         "--serverlist",
@@ -369,14 +385,12 @@ def parse_args(argv):
         action="store_true",
         help="If no process is found, do not start a new one.",
     )
-    parser.add_argument(
-        "--version", action="store_true", help="Show the nvr version."
-    )
+    parser.add_argument("--version", action="store_true", help="Show the nvr version.")
 
     return parser.parse_known_args(argv[1:])
 
 
-def show_message(address):
+def show_message(address: str) -> None:
     print(
         textwrap.dedent(
             f"""
@@ -417,9 +431,9 @@ def show_message(address):
     )
 
 
-def split_cmds_from_files(args):
-    cmds = []
-    files = []
+def split_cmds_from_files(args: list[str]) -> tuple[list[str], list[str]]:
+    cmds: list[str] = []
+    files: list[str] = []
     for _ in range(len(args)):
         if args[0][0] == "+":
             cmds.append(args.pop(0)[1:])
@@ -432,18 +446,18 @@ def split_cmds_from_files(args):
     return cmds, files
 
 
-def print_versions():
-    import pkg_resources
+def print_versions() -> None:
+    from importlib.metadata import version
 
-    print("nvr " + pkg_resources.require("nvim_remote")[0].version)
-    print("pynvim " + pkg_resources.require("pynvim")[0].version)
-    print("psutil " + pkg_resources.require("psutil")[0].version)
+    print("nvr " + version("nvim_remote"))
+    print("pynvim " + version("pynvim"))
+    print("psutil " + version("psutil"))
     print("Python " + sys.version.split("\n")[0])
 
 
-def print_addresses():
-    addresses = []
-    errors = []
+def print_addresses() -> None:
+    addresses: list[str] = []
+    errors: list[str] = []
 
     for proc in psutil.process_iter(attrs=["name"]):
         if proc.info["name"] == "nvim":
@@ -454,7 +468,7 @@ def print_addresses():
                     addresses.insert(0, ":".join(map(str, conn.laddr)))
                 try:
                     for conn in proc.connections("unix"):
-                        if conn.laddr:
+                        if conn.laddr and isinstance(conn.laddr, str):
                             addresses.insert(0, conn.laddr)
                 except FileNotFoundError:
                     # Windows does not support Unix domain sockets and WSL1
@@ -469,7 +483,7 @@ def print_addresses():
         print(error, file=sys.stderr)
 
 
-def parse_address(address) -> tuple[str, str, str | None]:
+def parse_address(address: str) -> tuple[str, str, str | None]:
     try:
         host, port = address.rsplit(":", 1)
         if port.isdigit():
@@ -479,7 +493,9 @@ def parse_address(address) -> tuple[str, str, str | None]:
         return "socket", address, None
 
 
-def main(argv=sys.argv, env=os.environ):
+def main(
+    argv: list[str] = sys.argv, env: dict[str, str] | os._Environ[str] = os.environ
+) -> None:
     options, arguments = parse_args(argv)
 
     if options.version:
@@ -490,11 +506,10 @@ def main(argv=sys.argv, env=os.environ):
         print_addresses()
         return
 
-    address = (
-        options.servername or env.get("NVIM") or env.get("NVIM_LISTEN_ADDRESS")
-    )
+    address = options.servername or env.get("NVIM") or env.get("NVIM_LISTEN_ADDRESS")
     if not address:
-        # Since before build 17063 windows doesn't support unix socket, we need another way
+        # Since before build 17063 windows doesn't support unix socket,
+        # we need another way
         address = "127.0.0.1:6789" if os.name == "nt" else "/tmp/nvimsocket"
 
     nvr = Nvr(address, options.s)
@@ -530,7 +545,9 @@ def main(argv=sys.argv, env=os.environ):
     proceed_after_attach(nvr, options, arguments)
 
 
-def proceed_after_attach(nvr: Nvr, options, arguments):
+def proceed_after_attach(
+    nvr: Nvr, options: argparse.Namespace, arguments: list[str]
+) -> None:
     assert nvr.server is not None
 
     if options.d:
@@ -546,9 +563,7 @@ def proceed_after_attach(nvr: Nvr, options, arguments):
         nvr.server.command("wincmd p")
 
     if options.remote is not None:
-        nvr.execute(
-            options.remote + arguments, "edit", bufdelete=options.bufdelete
-        )
+        nvr.execute(options.remote + arguments, "edit", bufdelete=options.bufdelete)
     elif options.remote_wait is not None:
         nvr.execute(
             options.remote_wait + arguments,
@@ -626,13 +641,7 @@ def proceed_after_attach(nvr: Nvr, options, arguments):
         if type(result) is bytes:
             print(result.decode())
         elif type(result) is list:
-            print(
-                list(
-                    map(
-                        lambda x: x.decode() if type(x) is bytes else x, result
-                    )
-                )
-            )
+            print([x.decode() if type(x) is bytes else x for x in result])
         elif type(result) is dict:
             print(
                 {
@@ -692,13 +701,11 @@ def proceed_after_attach(nvr: Nvr, options, arguments):
                     )
                 )
         else:
-            with open(options.q, "r") as f:
+            with open(options.q) as f:
                 for line in f.readlines():
                     nvr.server.command(
                         "caddexpr '{}'".format(
-                            line.rstrip()
-                            .replace("'", "''")
-                            .replace("|", r"\|")
+                            line.rstrip().replace("'", "''").replace("|", r"\|")
                         )
                     )
         nvr.server.command("silent lcd -")
@@ -714,9 +721,10 @@ def proceed_after_attach(nvr: Nvr, options, arguments):
     if wait_for_n_buffers > 0:
         exitcode = 0
 
-        def notification_cb(msg, args):
+        def notification_cb(msg: str, args: list[Any]) -> None:
             nonlocal wait_for_n_buffers
             nonlocal exitcode
+            assert nvr.server is not None
 
             if msg == "BufDelete":
                 wait_for_n_buffers -= 1
@@ -727,8 +735,9 @@ def proceed_after_attach(nvr: Nvr, options, arguments):
                 nvr.server.stop_loop()
                 exitcode = args[0]
 
-        def err_cb(error):
+        def err_cb(error: str) -> None:
             nonlocal exitcode
+            assert nvr.server is not None
             print(error, file=sys.stderr)
             nvr.server.stop_loop()
             exitcode = 1

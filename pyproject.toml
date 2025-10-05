@@ -1,29 +1,63 @@
-[tool.poetry]
+[project]
 name = "nvim-remote"
 version = "4.2.0"
 description = "Control nvim processes using \"nvr\" commandline tool"
 authors = [
-  "Parham Alvani <parham.alvani@gmail.com>",
-  "Marco Hinz <mh.codebro@gmail.com>",
-  "Roozbeh Sharifnasab <rsharifnasab@gmail.com>",
+  { name = "Parham Alvani", email = "parham.alvani@gmail.com" },
+  { name = "Marco Hinz", email = "mh.codebro@gmail.com" },
+  { name = "Roozbeh Sharifnasab", email = "rsharifnasab@gmail.com" },
 ]
-license = "MIT"
+license = { text = "MIT" }
 readme = "README.md"
-repository = "https://github.com/1995parham/nvim-remote"
 keywords = ["nvim-remote", "neovim-remote", "nvr"]
+requires-python = ">=3.12"
+dependencies = [
+  "pynvim>=0.5,<0.7",
+  "psutil>=5.9.6,<8.0.0",
+]
 
-[tool.poetry.scripts]
-nvr = 'nvim_remote:main'
+[project.urls]
+Repository = "https://github.com/1995parham/nvim-remote"
 
-[tool.poetry.dependencies]
-python = ">=3.12"
-pynvim = ">=0.5,<0.7"
-psutil = ">=5.9.6,<8.0.0"
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.4.2,<9.0.0"
+[project.scripts]
+nvr = "nvim_remote:main"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+  "pytest>=7.4.2,<9.0.0",
+  "ruff>=0.8.0",
+  "mypy>=1.13.0",
+  "types-psutil>=7.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "SIM", # flake8-simplify
+]
+ignore = []
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "pynvim.*"
+ignore_missing_imports = true

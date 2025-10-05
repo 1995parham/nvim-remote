@@ -14,10 +14,20 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.version }}
+      - uses: extractions/setup-just@v2
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - uses: MunifTanjim/setup-neovim-action@v1
         with:
           tag: nightly
       - run: nvim --version
-      - run: pip install poetry
-      - run: poetry install
-      - run: poetry run pytest
+      - name: Install dependencies
+        run: just install
+      - name: Run linter
+        run: just lint
+      - name: Run type checker
+        run: just type-check
+      - name: Run tests
+        run: just test
