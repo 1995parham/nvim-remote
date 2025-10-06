@@ -3,25 +3,20 @@ name: Publish to PyPI
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   test:
     name: lint and test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version: ["3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.version }}
+      - uses: actions/checkout@v5
       - uses: extractions/setup-just@v2
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          activate-environment: true
       - uses: MunifTanjim/setup-neovim-action@v1
         with:
           tag: nightly
@@ -39,25 +34,18 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
+      - uses: actions/checkout@v5
       - name: Install uv
         uses: astral-sh/setup-uv@v5
-
+        with:
+          enable-cache: true
+          activate-environment: true
       - name: Install just
         uses: extractions/setup-just@v2
-
       - name: Install twine
         run: uv pip install twine
-
       - name: Build package
         run: just build
-
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__

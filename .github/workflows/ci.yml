@@ -3,27 +3,22 @@ name: ci
 on:
   push:
     branches:
-      - '**'
+      - "**"
     tags-ignore:
-      - '**'
+      - "**"
 
 jobs:
   test:
     name: lint and test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version: ["3.12", "3.13"]
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.version }}
       - uses: extractions/setup-just@v2
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          activate-environment: true
       - uses: MunifTanjim/setup-neovim-action@v1
         with:
           tag: nightly
