@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v3
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
