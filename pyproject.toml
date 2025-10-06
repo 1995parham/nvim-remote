@@ -23,14 +23,6 @@ nvr = "nvim_remote:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-dev-dependencies = [
-  "pytest>=7.4.2,<9.0.0",
-  "ruff>=0.8.0",
-  "mypy>=1.13.0",
-  "types-psutil>=7.0.0",
-]
-
 [tool.ruff]
 line-length = 88
 target-version = "py312"
@@ -58,3 +50,11 @@ check_untyped_defs = true
 [[tool.mypy.overrides]]
 module = "pynvim.*"
 ignore_missing_imports = true
+
+[dependency-groups]
+dev = [
+  "pytest>=7.4.2,<9.0.0",
+  "ruff>=0.8.0",
+  "mypy>=1.13.0",
+  "types-psutil>=7.0.0",
+]
