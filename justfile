@@ -40,6 +40,10 @@ clean:
 build:
     uv build
 
+# Publish package to PyPI
+publish:
+    uv run twine upload dist/*
+
 # Run the application
 run *args:
     uv run nvr {{args}}
