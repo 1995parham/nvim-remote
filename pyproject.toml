@@ -1,6 +1,6 @@
 [project]
 name = "nvim-remote"
-version = "4.2.0"
+version = "5.0.0"
 description = "Control nvim processes using \"nvr\" commandline tool"
 authors = [
   { name = "Parham Alvani", email = "parham.alvani@gmail.com" },
@@ -11,10 +11,7 @@ license = { text = "MIT" }
 readme = "README.md"
 keywords = ["nvim-remote", "neovim-remote", "nvr"]
 requires-python = ">=3.12"
-dependencies = [
-  "pynvim>=0.5,<0.7",
-  "psutil>=5.9.6,<8.0.0",
-]
+dependencies = ["pynvim>=0.5,<0.7", "psutil>=5.9.6,<8.0.0"]
 
 [project.urls]
 Repository = "https://github.com/1995parham/nvim-remote"
