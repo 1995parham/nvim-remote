@@ -35,6 +35,17 @@ from typing import Any, NoReturn
 import psutil
 import pynvim
 
+NETRW_PROTOCOLS = [
+    re.compile("^davs?://*"),
+    re.compile("^file://*"),
+    re.compile("^ftp://*"),
+    re.compile("^https?://*"),
+    re.compile("^rcp://*"),
+    re.compile("^rsync://*"),
+    re.compile("^scp://*"),
+    re.compile("^sftp://*"),
+]
+
 
 class Nvr:
     def __init__(self, address: str, silent: bool = False) -> None:
@@ -58,7 +69,11 @@ class Nvr:
             pass
 
     def try_attach(
-        self, args: str, nvr: "Nvr", options: argparse.Namespace, arguments: list[str]
+        self,
+        args: list[str],
+        nvr: "Nvr",
+        options: argparse.Namespace,
+        arguments: list[str],
     ) -> None:
         for _ in range(10):
             self.attach()
@@ -95,7 +110,7 @@ class Nvr:
         args.extend(["--listen", self.address])
 
         multiprocessing.Process(
-            target=self.try_attach, args=(args[0], nvr, options, arguments)
+            target=self.try_attach, args=(args, nvr, options, arguments)
         ).start()
 
         try:
@@ -200,18 +215,7 @@ def stdin_cmd(cmd: str) -> str:
 
 
 def is_netrw_protocol(path: str) -> bool:
-    protocols = [
-        re.compile("^davs?://*"),
-        re.compile("^file://*"),
-        re.compile("^ftp://*"),
-        re.compile("^https?://*"),
-        re.compile("^rcp://*"),
-        re.compile("^rsync://*"),
-        re.compile("^scp://*"),
-        re.compile("^sftp://*"),
-    ]
-
-    return bool(any(prot.match(path) for prot in protocols))
+    return bool(any(prot.match(path) for prot in NETRW_PROTOCOLS))
 
 
 def parse_args(argv: list[str]) -> tuple[argparse.Namespace, list[str]]:
@@ -434,15 +438,16 @@ def show_message(address: str) -> None:
 def split_cmds_from_files(args: list[str]) -> tuple[list[str], list[str]]:
     cmds: list[str] = []
     files: list[str] = []
-    for _ in range(len(args)):
-        if args[0][0] == "+":
-            cmds.append(args.pop(0)[1:])
-        elif args[0] == "--":
-            args.pop(0)
-            files += args
+    i = 0
+    while i < len(args):
+        if args[i].startswith("+"):
+            cmds.append(args[i][1:])
+        elif args[i] == "--":
+            files.extend(args[i + 1 :])
             break
         else:
-            files.append(args.pop(0))
+            files.append(args[i])
+        i += 1
     return cmds, files
 
 
@@ -638,14 +643,14 @@ def proceed_after_attach(
             """
                 )
             )
-        if type(result) is bytes:
+        if isinstance(result, bytes):
             print(result.decode())
-        elif type(result) is list:
-            print([x.decode() if type(x) is bytes else x for x in result])
-        elif type(result) is dict:
+        elif isinstance(result, list):
+            print([x.decode() if isinstance(x, bytes) else x for x in result])
+        elif isinstance(result, dict):
             print(
                 {
-                    (k.decode() if type(k) is bytes else k): v
+                    (k.decode() if isinstance(k, bytes) else k): v
                     for (k, v) in result.items()
                 }
             )
@@ -690,7 +695,7 @@ def proceed_after_attach(
             sys.exit(1)
 
     if options.q:
-        path = nvr.server.funcs.fnameescape(os.environ["PWD"])
+        path = nvr.server.funcs.fnameescape(os.getcwd())
         nvr.server.command("lcd " + path)
         nvr.server.funcs.setqflist([])
         if options.q == "-":
