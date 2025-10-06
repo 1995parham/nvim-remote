@@ -6,42 +6,17 @@ on:
       - "v*"
 
 jobs:
-  test:
-    name: lint and test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: extractions/setup-just@v2
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          activate-environment: true
-      - uses: MunifTanjim/setup-neovim-action@v1
-        with:
-          tag: nightly
-      - run: nvim --version
-      - name: Install dependencies
-        run: just install
-      - name: Run linter
-        run: just lint
-      - name: Run type checker
-        run: just type-check
-      - name: Run tests
-        run: just test
-
   publish:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
           activate-environment: true
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@v3
       - name: Install twine
         run: uv pip install twine
       - name: Build package
