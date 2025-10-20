@@ -46,7 +46,7 @@ publish:
 
 # Run the application
 run *args:
-    uv run nvr {{args}}
+    uv run nvr {{ args }}
 
 # Show help
 help:
