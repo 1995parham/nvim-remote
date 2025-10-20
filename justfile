@@ -1,3 +1,6 @@
+default:
+    @just --list
+
 # Run tests with pytest
 test:
     uv run pytest
@@ -48,6 +51,6 @@ publish:
 run *args:
     uv run nvr {{ args }}
 
-# Show help
-help:
-    @just --list
+# upgrade all dependencies
+upgrade:
+    uv sync --all-groups -U
