@@ -16,7 +16,7 @@ jobs:
           enable-cache: true
           activate-environment: true
       - name: Install just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@v4
       - name: Install twine
         run: uv pip install twine
       - name: Build package
